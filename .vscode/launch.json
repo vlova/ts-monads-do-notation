@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Mocha Attach",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "protocol": "inspector",
+            "timeout": 5000,
+            "stopOnEntry": false,
+            "skipFiles": [
+                "${workspaceFolder}/node_modules/**/*.js",
+                "**/.vscode/**/*.js",
+                "<node_internals>/**/*.js"
+            ]
+        }
+    ]
+}

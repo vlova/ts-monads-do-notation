@@ -1,0 +1,17 @@
+{
+    "mochaExplorer.files": "**/*.test.ts",
+    "mochaExplorer.require": "ts-node/register",
+    "mochaExplorer.debuggerConfig": "Mocha Attach",
+    "mochaExplorer.env": {
+        "TS_NODE_PROJECT": "tsconfig.json",
+        "NODE_ENV": "development"
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/lib": true,
+    }
+}
