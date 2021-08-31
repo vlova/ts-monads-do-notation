@@ -1,4 +1,4 @@
-import { cloneableGenerator, CloneableGenerator } from "./cloneableGenerator";
+import { cloneableGenerator, CloneableGenerator } from "../utils/cloneableGenerator";
 
 function runState<TIn, TReturn>(
     generatorFunc: () => Generator<

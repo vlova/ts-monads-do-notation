@@ -1,12 +1,12 @@
-import { makeMonad } from "./buildMonad";
-import { BuiltMonad, AbstractMonad } from "./monadTypes";
+import { makeMonad } from "../core/buildMonad";
+import { BuiltMonad, AbstractMonad } from "../core/monadTypes";
 
 export const ListURI = 'List';
 export type ListURI = typeof ListURI
 
 export type List<T> = AbstractMonad<ListURI, T, T[], { get: () => T[] }>;
 
-declare module './hkt' {
+declare module '../utils/hkt' {
     interface URItoKind<A> {
         readonly List: List<A>
     }

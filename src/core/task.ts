@@ -12,7 +12,7 @@ export type TaskMonadInstance<T>
         { get: () => Promise<T> }
     >;
 
-declare module './hkt' {
+declare module '../utils/hkt' {
     interface URItoKind<A> {
         readonly Task: TaskMonadInstance<A>
     }

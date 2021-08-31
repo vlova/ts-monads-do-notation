@@ -1,5 +1,5 @@
-import { makeMonad } from "./buildMonad";
-import { BuiltMonad, AbstractMonad } from "./monadTypes";
+import { makeMonad } from "../core/buildMonad";
+import { BuiltMonad, AbstractMonad } from "../core/monadTypes";
 
 export const MaybeURI = 'Maybe';
 export type MaybeURI = typeof MaybeURI
@@ -12,7 +12,7 @@ export type MaybeMonadInstance<T>
         { get: () => T | undefined }
     >;
 
-declare module './hkt' {
+declare module '../utils/hkt' {
     interface URItoKind<A> {
         readonly Maybe: MaybeMonadInstance<A>
     }

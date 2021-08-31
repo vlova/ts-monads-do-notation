@@ -1,4 +1,4 @@
-import { Kind, URIS } from "./hkt";
+import { Kind, URIS } from "../utils/hkt";
 
 export type AbstractMonad<TMonadUri, TValue, TCtorArg, TPayload>
     = Generator<

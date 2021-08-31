@@ -1,5 +1,5 @@
-import { CloneableGenerator, cloneableGenerator } from "./cloneableGenerator";
-import { Kind, URIS } from "./hkt";
+import { CloneableGenerator, cloneableGenerator } from "../utils/cloneableGenerator";
+import { Kind, URIS } from "../utils/hkt";
 import { BuiltMonad, GetMonadCtorArg, GetMonadPayload } from "./monadTypes";
 
 export interface MakeMonadOptions<TMonadUri extends URIS>
