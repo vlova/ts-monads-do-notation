@@ -1,3 +1,5 @@
+// Note: this file was stolen from redux-saga package
+
 export type CloneableGenerator<T, TReturn, TNext>
     = Generator<T, TReturn, TNext>
     & {

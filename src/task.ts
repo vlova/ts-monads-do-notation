@@ -1,65 +1,36 @@
-import { cloneableGenerator, CloneableGenerator } from "./cloneableGenerator";
+import { makeMonad } from "./buildMonad";
+import { BuiltMonad, AbstractMonad } from "./monadTypes";
 
-function runTask<TReturn>(
-    generatorFunc: () => Generator<
-        TaskMonadInstance<unknown>,
-        TReturn,
-        unknown
-    >
-): TaskMonadInstance<TReturn> {
-    const generator = cloneableGenerator(generatorFunc)();
+export const TaskURI = 'Task';
+export type TaskURI = typeof TaskURI
 
-    function recursiveApply(
-        isFirst: boolean,
-        prevValue: any,
-        generator: CloneableGenerator<unknown, TReturn, unknown>
-    ): TaskMonadInstance<TReturn> {
-        const result = isFirst
-            ? generator.next()
-            : generator.next(prevValue);
+export type TaskMonadInstance<T>
+    = AbstractMonad<
+        TaskURI,
+        T,
+        Promise<T>,
+        { get: () => Promise<T> }
+    >;
 
-        if (result.done) {
-            return toTask(result.value);
-        }
-
-        return flatMap(result.value as any, value => {
-            return recursiveApply(false, value, generator.clone());
-        })
+declare module './hkt' {
+    interface URItoKind<A> {
+        readonly Task: TaskMonadInstance<A>
     }
-
-    return recursiveApply(true, undefined!, generator.clone() as any);
 }
 
-function flatMap<T, TResult>(
-    monad: TaskMonadInstance<T>,
-    selector: (value: T) => TaskMonadInstance<TResult>
-): TaskMonadInstance<TResult> {
-    const promise = monad.get();
-    const t = promise.then(v => selector(v).get());
-    return toTask<TResult>(t);
-}
 
-function toTask<T>(promise: T): TaskMonadInstance<T>
-function toTask<T>(promise: Promise<T>): TaskMonadInstance<T>
-function toTask<T>(promise: T | Promise<T>): TaskMonadInstance<T> {
-    function* makeGenerator(): Generator<TaskMonadInstance<T>, T, T> {
-        const internalReturn = yield generator;
-        return internalReturn;
+export const Task: BuiltMonad<TaskURI> = makeMonad({
+    URI: TaskURI,
+
+    toCtorArg: value => Promise.resolve(value),
+
+    makePayload: <T>(value: T) => ({
+        get: () => value
+    }),
+
+    flatMap: (monad, selector) => {
+        const promise = monad.get();
+        const t = promise.then(v => selector(v).get());
+        return Task.make(t);
     }
-
-    const generator = makeGenerator() as TaskMonadInstance<T>;
-    generator["@@monad/type"] = 'task';
-    generator.get = () => Promise.resolve(promise);
-    return generator;
-}
-
-type TaskMonadInstance<TValue>
-    = Generator<TaskMonadInstance<TValue>, TValue, TValue> & {
-        '@@monad/type': 'task',
-        get: () => Promise<TValue>;
-    }
-
-export const task = {
-    run: runTask,
-    make: toTask,
-}
+});

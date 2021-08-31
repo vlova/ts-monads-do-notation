@@ -1,17 +1,17 @@
 import { expect } from "chai";
-import { maybe } from ".";
-import { task } from ".";
-import { list } from ".";
-import { stateLike } from ".";
+import { Maybe } from ".";
+import { Task } from ".";
+import { List } from ".";
+import { StateLike } from ".";
 
 
 describe('Monads', () => {
     describe('Maybe', () => {
         it('maybe monad returns result', () => {
-            const maybeResult = maybe.run(
+            const maybeResult = Maybe.run(
                 function* () {
-                    const value1 = yield* maybe.make(1);
-                    const value2 = yield* maybe.make('2');
+                    const value1 = yield* Maybe.make(1);
+                    const value2 = yield* Maybe.make('2');
                     return (value1 + '' + value2).toString();
                 });
 
@@ -19,10 +19,10 @@ describe('Monads', () => {
         })
 
         it('maybe monad returns undefined', () => {
-            const maybeResult = maybe.run(
+            const maybeResult = Maybe.run(
                 function* () {
-                    const value1 = yield* maybe.make(1);
-                    const value2 = yield* maybe.make(undefined);
+                    const value1 = yield* Maybe.make(10);
+                    const value2 = yield* Maybe.make(undefined);
                     return (value1 + '' + value2).toString();
                 });
 
@@ -33,10 +33,10 @@ describe('Monads', () => {
 
     describe('Task', () => {
         it('task monad returns result', async () => {
-            const taskResult = task.run(
+            const taskResult = Task.run(
                 function* () {
-                    const value1 = yield* task.make(Promise.resolve(1));
-                    const value2 = yield* task.make('2');
+                    const value1 = yield* Task.make(Promise.resolve(1));
+                    const value2 = yield* Task.make(new Promise(resolve => setTimeout(() => resolve('2'), 10)));
                     return (value1 + '' + value2).toString();
                 });
 
@@ -46,11 +46,11 @@ describe('Monads', () => {
 
     describe('List', () => {
         it('list monad returns result', async () => {
-            const listResult = list.run(
+            const listResult = List.run(
                 function* () {
-                    const base = yield* list.make([1, 2]);
-                    const multiplier = yield* list.make([10]);
-                    const suffix = yield* list.make(['a', 'b']);
+                    const base = yield* List.make([1, 2]);
+                    const multiplier = yield* List.make([10]);
+                    const suffix = yield* List.make(['a', 'b']);
                     return (base * multiplier + '' + suffix).toString();
                 });
 
@@ -60,13 +60,13 @@ describe('Monads', () => {
 
     describe('State-like', () => {
         it('State-like monad returns result', async () => {
-            const push = (value: number) => stateLike.update((col: number[]) => [...col, value]);
+            const push = (value: number) => StateLike.update((col: number[]) => [...col, value]);
 
-            const stateResult = stateLike.run(
+            const stateResult = StateLike.run(
                 function* () {
                     yield* push(1);
                     yield* push(2);
-                    const [a, b, c] = yield* stateLike.get<number[]>();
+                    const [a, b, c] = yield* StateLike.get<number[]>();
                     return (a + b + (c ?? 0));
                 });
 

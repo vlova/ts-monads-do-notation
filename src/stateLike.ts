@@ -64,7 +64,7 @@ function getState<TState>(): StateMonadInstance<TState, TState> {
     return updateState(state => state);
 }
 
-export const stateLike = {
+export const StateLike = {
     run: runState,
     update: updateState,
     get: getState,

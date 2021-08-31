@@ -1,65 +1,39 @@
-import { cloneableGenerator, CloneableGenerator } from "./cloneableGenerator";
+import { makeMonad } from "./buildMonad";
+import { BuiltMonad, AbstractMonad } from "./monadTypes";
 
-function runMaybe<TReturn>(
-    generatorFunc: () => Generator<
-        MaybeMonadInstance<unknown>,
-        TReturn,
-        unknown
-    >
-): MaybeMonadInstance<TReturn> {
-    const generator = cloneableGenerator(generatorFunc)();
+export const MaybeURI = 'Maybe';
+export type MaybeURI = typeof MaybeURI
 
-    function recursiveApply(
-        isFirst: boolean,
-        prevValue: any,
-        generator: CloneableGenerator<unknown, TReturn, unknown>
-    )
-        : MaybeMonadInstance<TReturn> {
-        const result = isFirst
-            ? generator.next()
-            : generator.next(prevValue);
+export type MaybeMonadInstance<T>
+    = AbstractMonad<
+        MaybeURI,
+        T,
+        T | undefined,
+        { get: () => T | undefined }
+    >;
 
-        if (result.done) {
-            return toMaybe(result.value);
+declare module './hkt' {
+    interface URItoKind<A> {
+        readonly Maybe: MaybeMonadInstance<A>
+    }
+}
+
+export const Maybe: BuiltMonad<MaybeURI> = makeMonad({
+    URI: MaybeURI,
+
+    toCtorArg: value => value,
+
+    makePayload: <T>(value: T) => ({
+        get: () => value
+    }),
+
+    flatMap: (monad, selector) => {
+        const value = monad.get();
+
+        if (value != null) {
+            return selector(value);
         }
 
-        return flatMap(result.value as any, value => {
-            return recursiveApply(false, value, generator.clone());
-        })
+        return Maybe.make(undefined!);
     }
-
-    return recursiveApply(true, undefined!, generator.clone() as any);
-}
-
-function flatMap<T, TResult>(monad: MaybeMonadInstance<T>, selector: (value: T) => MaybeMonadInstance<TResult>): MaybeMonadInstance<TResult> {
-    const value = monad.get();
-
-    return value != null
-        ? selector(value)
-        : toMaybe<TResult>(undefined);
-}
-
-function toMaybe<T>(value: T | undefined | null): MaybeMonadInstance<T>
-function toMaybe<T>(value: T): MaybeMonadInstance<T>
-function toMaybe<T>(value: T | undefined): any {
-    function* makeGenerator(): Generator<MaybeMonadInstance<T>, T, T> {
-        const internalReturn = yield generator;
-        return internalReturn;
-    }
-
-    const generator = makeGenerator() as MaybeMonadInstance<T>;
-    generator["@@monad/type"] = 'maybe';
-    generator.get = () => value;
-    return generator;
-}
-
-type MaybeMonadInstance<TValue>
-    = Generator<MaybeMonadInstance<TValue>, TValue, TValue> & {
-        '@@monad/type': 'maybe',
-        get: () => TValue | undefined;
-    }
-
-export const maybe = {
-    run: runMaybe,
-    make: toMaybe,
-}
+});
