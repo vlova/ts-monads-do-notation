@@ -7,7 +7,7 @@ export type ListURI = typeof ListURI
 export type List<T> = AbstractMonad<ListURI, T, T[], { get: () => T[] }>;
 
 declare module '../utils/hkt' {
-    interface URItoKind<A> {
+    interface TypeIdToTypeMap<A> {
         readonly List: List<A>
     }
 }

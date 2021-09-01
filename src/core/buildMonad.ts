@@ -1,31 +1,31 @@
 import { CloneableGenerator, cloneableGenerator } from "../utils/cloneableGenerator";
-import { Kind, URIS } from "../utils/hkt";
+import { MakeType, TypeIds } from "../utils/hkt";
 import { BuiltMonad, GetMonadCtorArg, GetMonadPayload } from "./monadTypes";
 
-export interface MakeMonadOptions<TMonadUri extends URIS>
+export interface MakeMonadOptions<TMonadUri extends TypeIds>
     extends Pick<BuiltMonad<TMonadUri>, 'URI' | 'flatMap'> {
 
-    readonly toCtorArg: <TValue>(singleValue: TValue) => GetMonadCtorArg<Kind<TMonadUri, TValue>>,
+    readonly toCtorArg: <TValue>(singleValue: TValue) => GetMonadCtorArg<MakeType<TMonadUri, TValue>>,
 
-    readonly makePayload: <A>(arg: GetMonadCtorArg<Kind<TMonadUri, A>>)
-        => GetMonadPayload<Kind<TMonadUri, A>>;
+    readonly makePayload: <A>(arg: GetMonadCtorArg<MakeType<TMonadUri, A>>)
+        => GetMonadPayload<MakeType<TMonadUri, A>>;
 }
 
-function makeMonadRunner<URI extends URIS>(options: MakeMonadOptions<URI>) {
+function makeMonadRunner<URI extends TypeIds>(options: MakeMonadOptions<URI>) {
     return function run<TReturn>(
         generatorFunc: () => Generator<
-            Kind<URI, unknown>,
+            MakeType<URI, unknown>,
             TReturn,
             unknown
         >
-    ): Kind<URI, TReturn> {
+    ): MakeType<URI, TReturn> {
         const generator = cloneableGenerator(generatorFunc)();
 
         function recursiveApply(
             isFirst: boolean,
             prevValue: unknown,
             generator: CloneableGenerator<unknown, TReturn, unknown>
-        ): Kind<URI, TReturn> {
+        ): MakeType<URI, TReturn> {
             const result = isFirst
                 ? generator.next()
                 : generator.next(prevValue);
@@ -34,7 +34,7 @@ function makeMonadRunner<URI extends URIS>(options: MakeMonadOptions<URI>) {
                 return makeMonadFactory(options)(options.toCtorArg(result.value));
             }
 
-            return options.flatMap(result.value as Kind<URI, unknown>, (value: unknown) => {
+            return options.flatMap(result.value as MakeType<URI, unknown>, (value: unknown) => {
                 return recursiveApply(false, value, generator.clone());
             })
         }
@@ -43,11 +43,11 @@ function makeMonadRunner<URI extends URIS>(options: MakeMonadOptions<URI>) {
     }
 }
 
-function makeMonadFactory<TMonadUri extends URIS>(options: MakeMonadOptions<TMonadUri>) {
+function makeMonadFactory<TMonadUri extends TypeIds>(options: MakeMonadOptions<TMonadUri>) {
     return function make<
         TValue,
-        TMonad extends Kind<TMonadUri, TValue>
-    >(value: GetMonadCtorArg<TMonad>): Kind<TMonadUri, TValue> {
+        TMonad extends MakeType<TMonadUri, TValue>
+    >(value: GetMonadCtorArg<TMonad>): MakeType<TMonadUri, TValue> {
         function* makeGenerator(): Generator<TMonad, TValue, TValue> {
             const internalReturn = yield generator;
             return internalReturn;
@@ -60,7 +60,9 @@ function makeMonadFactory<TMonadUri extends URIS>(options: MakeMonadOptions<TMon
     }
 }
 
-export function makeMonad<TMonadUri extends URIS>(options: MakeMonadOptions<TMonadUri>): BuiltMonad<TMonadUri> {
+export function makeMonad<TMonadUri extends TypeIds>(
+    options: MakeMonadOptions<TMonadUri>
+): BuiltMonad<TMonadUri> {
     return {
         ...options,
         run: makeMonadRunner(options),

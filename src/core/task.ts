@@ -13,7 +13,7 @@ export type TaskMonadInstance<T>
     >;
 
 declare module '../utils/hkt' {
-    interface URItoKind<A> {
+    interface TypeIdToTypeMap<A> {
         readonly Task: TaskMonadInstance<A>
     }
 }

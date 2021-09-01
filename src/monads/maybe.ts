@@ -4,7 +4,7 @@ import { BuiltMonad, AbstractMonad } from "../core/monadTypes";
 export const MaybeURI = 'Maybe';
 export type MaybeURI = typeof MaybeURI
 
-export type MaybeMonadInstance<T>
+export type Maybe<T>
     = AbstractMonad<
         MaybeURI,
         T,
@@ -13,8 +13,8 @@ export type MaybeMonadInstance<T>
     >;
 
 declare module '../utils/hkt' {
-    interface URItoKind<A> {
-        readonly Maybe: MaybeMonadInstance<A>
+    interface TypeIdToTypeMap<A> {
+        readonly Maybe: Maybe<A>
     }
 }
 

@@ -1,4 +1,4 @@
-import { Kind, URIS } from "../utils/hkt";
+import { MakeType, TypeIds } from "../utils/hkt";
 
 export type AbstractMonad<TMonadUri, TValue, TCtorArg, TPayload>
     = Generator<
@@ -30,21 +30,21 @@ export type GetMonadCtorArg<TMonad>
 export type GetMonadPayload<TMonad>
     = GetMonadTypeArg<TMonad, 'payload'>;
 
-export interface BuiltMonad<TMonadUri extends URIS> {
+export interface BuiltMonad<TMonadUri extends TypeIds> {
     readonly URI: TMonadUri;
 
     readonly flatMap: <A, B>(
-        monad: Kind<TMonadUri, A>,
-        selector: (a: A) => Kind<TMonadUri, B>
-    ) => Kind<TMonadUri, B>,
+        monad: MakeType<TMonadUri, A>,
+        selector: (a: A) => MakeType<TMonadUri, B>
+    ) => MakeType<TMonadUri, B>,
 
-    readonly make: <TValue>(a: GetMonadCtorArg<Kind<TMonadUri, TValue>>) => Kind<TMonadUri, TValue>;
+    readonly make: <TValue>(a: GetMonadCtorArg<MakeType<TMonadUri, TValue>>) => MakeType<TMonadUri, TValue>;
 
     readonly run: <TComputationResult>(
         generatorFunc: () => Generator<
-            Kind<TMonadUri, unknown>,
+            MakeType<TMonadUri, unknown>,
             TComputationResult,
             unknown
         >
-    ) => Kind<TMonadUri, TComputationResult>;
+    ) => MakeType<TMonadUri, TComputationResult>;
 }
