@@ -50,7 +50,7 @@ describe('Monads', () => {
                     const base = yield* List.make([1, 2]);
                     const multiplier = yield* List.make([10]);
                     const suffix = yield* List.make(['a', 'b']);
-                    return (base * multiplier + '' + suffix).toString();
+                    return (base * multiplier + '' + suffix);
                 });
 
             expect(listResult.get()).to.deep.equal(['10a', '10b', '20a', '20b']);
