@@ -184,6 +184,8 @@ Maybe this problem can be reduced by:
 1. Writing lint rule that denies side-effects in monad runners
 2. Providing a way to cache heavy computations (like `React.useMemo`).
 
+Another solution is to leverage typescript transformers. Typescript transformer can produce faster code comparing to naive monad runner.
+
 I took sources of the cloneable generator from the `redux-saga` package.
 There is also [immutagen](https://github.com/pelotom/immutagen) package. It does the same work but in another way.
 
