@@ -1,12 +1,12 @@
-import { makeMonad } from "./buildMonad";
-import { BuiltMonad, AbstractMonad } from "./monadTypes";
+import { makeMonad } from "../core/buildMonad";
+import { BuiltMonad, AbstractMonad } from "../core/monadTypes";
 
-export const TaskURI = 'Task';
-export type TaskURI = typeof TaskURI
+export const TaskTypeId = Symbol('Task');
+export type TaskTypeId = typeof TaskTypeId
 
-export type TaskMonadInstance<T>
+export type Task<T>
     = AbstractMonad<
-        TaskURI,
+        TaskTypeId,
         T,
         Promise<T>,
         { get: () => Promise<T> }
@@ -14,13 +14,13 @@ export type TaskMonadInstance<T>
 
 declare module '../utils/hkt' {
     interface TypeIdToTypeMap<A> {
-        readonly Task: TaskMonadInstance<A>
+        readonly [TaskTypeId]: Task<A>
     }
 }
 
 
-export const Task: BuiltMonad<TaskURI> = makeMonad({
-    URI: TaskURI,
+export const Task: BuiltMonad<TaskTypeId> = makeMonad({
+    typeId: TaskTypeId,
 
     toCtorArg: value => Promise.resolve(value),
 

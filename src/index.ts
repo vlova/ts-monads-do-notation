@@ -1,4 +1,4 @@
 export { Maybe } from './monads/maybe';
-export { Task  } from './core/task';
+export { Task  } from './monads/task';
 export { List } from './monads/list';
-export { StateLike as StateLike } from './monads/stateLike';
+export { StateLike } from './monads/stateLike';

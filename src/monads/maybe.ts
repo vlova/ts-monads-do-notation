@@ -1,12 +1,12 @@
 import { makeMonad } from "../core/buildMonad";
 import { BuiltMonad, AbstractMonad } from "../core/monadTypes";
 
-export const MaybeURI = 'Maybe';
-export type MaybeURI = typeof MaybeURI
+export const MaybeTypeId = Symbol('Maybe');
+export type MaybeTypeId = typeof MaybeTypeId
 
 export type Maybe<T>
     = AbstractMonad<
-        MaybeURI,
+        MaybeTypeId,
         T,
         T | undefined,
         { get: () => T | undefined }
@@ -14,12 +14,12 @@ export type Maybe<T>
 
 declare module '../utils/hkt' {
     interface TypeIdToTypeMap<A> {
-        readonly Maybe: Maybe<A>
+        readonly [MaybeTypeId]: Maybe<A>
     }
 }
 
-export const Maybe: BuiltMonad<MaybeURI> = makeMonad({
-    URI: MaybeURI,
+export const Maybe: BuiltMonad<MaybeTypeId> = makeMonad({
+    typeId: MaybeTypeId,
 
     toCtorArg: value => value,
 

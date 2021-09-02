@@ -4,7 +4,6 @@ import { Task } from ".";
 import { List } from ".";
 import { StateLike } from ".";
 
-
 describe('Monads', () => {
     describe('Maybe', () => {
         it('maybe monad returns result', () => {
